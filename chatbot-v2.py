@@ -27,7 +27,7 @@ def refresh_auth_token():
     info = response.json()
     return info['access_token']
 
-@retry(reraise=True, wait=wait_fixed(0.5) + wait_random(0, 1), stop=stop_after_attempt(3))
+@retry(reraise=True, wait=wait_fixed(1) + wait_random(0, 1), stop=stop_after_attempt(5))
 def execute_sequence(sequence_name, payload):
     access_token = refresh_auth_token()
     headers = {
@@ -39,6 +39,8 @@ def execute_sequence(sequence_name, payload):
     route = api_base_url + '/api/v1/execute?sequence-name=' + sequence_name
     response = requests.post(route, headers=headers, data=json.dumps(payload))
     output = response.json()
+    print("raw output")
+    print(output)
     if 'preds' not in output:
         raise ValueError("missing preds")
     
